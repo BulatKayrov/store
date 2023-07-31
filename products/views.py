@@ -11,30 +11,50 @@ class IndexView(generic.TemplateView):
     template_name = 'products/index.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(IndexView, self).get_context_data(**kwargs)
         context['title'] = 'Store'
         return context
 
 
-def products(request, pk=None, page=1):
+class ProductsListView(generic.ListView):
+    model = Product
+    template_name = 'products/products.html'
+    context_object_name = 'products'
+    paginate_by = 3
 
-    """Вью отображение страницы с продуктами"""
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category_id = self.kwargs.get('category_id')
+        if category_id:
+            return queryset.filter(category_id=category_id)
+        return queryset
 
-    if pk:
-        product = Product.objects.filter(category_id=pk)
-    else:
-        product = Product.objects.all()
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['title'] = 'Store - каталог'
+        context['categories'] = ProductCategory.objects.all()
+        return context
 
-    paginator = Paginator(object_list=product, per_page=3)
-    products_paginator = paginator.page(page)
 
-    context = {
-        'title': 'Store',
-        'categories': ProductCategory.objects.all(),
-        'products': products_paginator,
-    }
-
-    return render(request, 'products/products.html', context=context)
+# def products(request, pk=None, page=1):
+#
+#     """Вью отображение страницы с продуктами"""
+#
+#     if pk:
+#         product = Product.objects.filter(category_id=pk)
+#     else:
+#         product = Product.objects.all()
+#
+#     paginator = Paginator(object_list=product, per_page=3)
+#     products_paginator = paginator.page(page)
+#
+#     context = {
+#         'title': 'Store',
+#         'categories': ProductCategory.objects.all(),
+#         'products': products_paginator,
+#     }
+#
+#     return render(request, 'products/products.html', context=context)
 
 
 @login_required
