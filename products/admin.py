@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import ProductCategory, Product, Basket
-
+from .models import Basket, Product, ProductCategory
 
 # class ProductCategoryInline(admin.TabularInline):
 #     model = ProductCategory

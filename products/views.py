@@ -1,9 +1,8 @@
-from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.views import generic
-from .models import Product, ProductCategory, Basket
+
+from .models import Basket, Product, ProductCategory
 
 
 class IndexView(generic.TemplateView):
@@ -74,5 +73,3 @@ def basket_add(request, pk):
 def basket_remove(request, pk):
     Basket.objects.get(pk=pk).delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
-
-

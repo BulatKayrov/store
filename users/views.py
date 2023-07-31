@@ -1,14 +1,16 @@
-from django.contrib import auth
 from django.contrib.auth import views
-from django.urls import reverse_lazy
-from products.models import Basket
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
 from django.views import generic
-from .forms import UserLoginForm, UserRegistrationForm, UserProfileForm
-from .models import User
+
+from .forms import UserLoginForm, UserProfileForm, UserRegistrationForm
+from .models import EmailVerification, User
 
 
 class UserLoginView(views.LoginView):
     template_name = 'users/login.html'
+    form_class = UserLoginForm
+    next_page = reverse_lazy('products:index')
 
 
 class UserRegistrationView(generic.CreateView):
@@ -19,7 +21,7 @@ class UserRegistrationView(generic.CreateView):
 
 
 class UserLogoutView(views.LogoutView):
-    pass
+    next_page = reverse_lazy('users:login')
 
 
 class ProfileUpdateView(generic.UpdateView):
@@ -29,13 +31,23 @@ class ProfileUpdateView(generic.UpdateView):
 
     def get_success_url(self):
         """Переопределяем перенаправление, в args передаем id пользователя"""
+
         return reverse_lazy('users:profile', args=(self.object.id,))
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['baskets'] = Basket.objects.filter(user=self.object)
-        return context
 
+class EmailVerificationView(generic.TemplateView):
+    template_name = 'users/email_verification.html'
+
+    def get(self, request, *args, **kwargs):
+        code = kwargs['code']
+        user = User.objects.get(email=kwargs['email'])
+        email_verification = EmailVerification.objects.filter(user=user, code=code)
+        if email_verification.exists() and not email_verification.first().is_expired():
+            user.is_verified_email = True
+            user.save()
+            return super(EmailVerificationView, self).get(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect(redirect_to=reverse('products:index'))
 
 # def login(request):
 #     """Вью авторизации пользователя"""
@@ -95,4 +107,3 @@ class ProfileUpdateView(generic.UpdateView):
 # def user_logout(request):
 #     auth.logout(request)
 #     return HttpResponseRedirect(redirect_to=reverse('products:index'))
-
