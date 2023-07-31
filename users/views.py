@@ -10,7 +10,6 @@ from .models import EmailVerification, User
 class UserLoginView(views.LoginView):
     template_name = 'users/login.html'
     form_class = UserLoginForm
-    next_page = reverse_lazy('products:index')
 
 
 class UserRegistrationView(generic.CreateView):
