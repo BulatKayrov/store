@@ -23,7 +23,9 @@ class Product(models.Model):
     price = models.DecimalField(verbose_name='Цена', max_digits=15, decimal_places=2)
     quantity = models.PositiveIntegerField(verbose_name='Количество', default=0)
     image = models.ImageField(verbose_name='Изображение', upload_to='product')
-    category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT, verbose_name='Категория')
+    category = models.ForeignKey(
+        ProductCategory, on_delete=models.PROTECT, verbose_name='Категория', related_name='category')
+
 
     class Meta:
         verbose_name = 'Товар'

@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.views import generic
-
+from django.core.cache import cache
 from .models import Basket, Product, ProductCategory
 
 
@@ -19,7 +19,7 @@ class ProductsListView(generic.ListView):
     model = Product
     template_name = 'products/products.html'
     context_object_name = 'products'
-    paginate_by = 3
+    paginate_by = 6
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -31,7 +31,13 @@ class ProductsListView(generic.ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
         context['title'] = 'Store - каталог'
-        context['categories'] = ProductCategory.objects.all()
+        categories = cache.get('categories')
+        print(categories)
+        if categories:
+            context['categories'] = categories
+        else:
+            context['categories'] = ProductCategory.objects.all()
+            cache.set('categories', context['categories'], 30)
         return context
 
 
