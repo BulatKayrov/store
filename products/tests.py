@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
@@ -12,9 +11,3 @@ class IndexViewTestCase(TestCase):
         self.assertEquals(response.context['title'], 'Store')
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'products/index.html')
-
-
-
-
-
-

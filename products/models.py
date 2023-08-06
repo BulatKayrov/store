@@ -26,7 +26,6 @@ class Product(models.Model):
     category = models.ForeignKey(
         ProductCategory, on_delete=models.PROTECT, verbose_name='Категория', related_name='category')
 
-
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
@@ -42,6 +41,7 @@ class Product(models.Model):
 
 class BasketQuerySet(models.QuerySet):
     """Добавляем методы в objects"""
+
     def total_sum(self):
         return sum(basket.product_sum() for basket in self)
 
@@ -64,3 +64,12 @@ class Basket(models.Model):
 
     def __str__(self):
         return f'{self.product.name} for {self.user.username}'
+
+    def de_json(self):
+        basket_item = {
+            'product_name': self.product.name,
+            'quantity': self.quantity,
+            'price': float(self.product.price),
+            'sum': float(self.product_sum()),
+        }
+        return basket_item

@@ -3,6 +3,7 @@ from django.contrib.auth.forms import (AuthenticationForm, UserChangeForm,
                                        UserCreationForm)
 
 from users.models import User
+
 from .tasks import send_email_verification
 
 

@@ -1,6 +1,8 @@
+from http import HTTPStatus
+
 from django.test import TestCase
 from django.urls import reverse
-from http import HTTPStatus
+
 from .models import User
 
 
@@ -36,5 +38,3 @@ class UserRegistrationTestCase(TestCase):
 
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, 'users/login.html')
-
-
