@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: ["gunicorn", "store.wsgi:application", "--bind", "0.0.0.0:8000"]
+    ports:
+      - "8000:8000"
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    image: redis
+  db:
+    image: postgres
+    env_file:
+      - .env
+  celery:
+    build:
+      context: .
+    command: celery -A store worker -l INFO
+    environment:
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - app
+#  celery:
+#    build: .
+#    command: celery -A store worker -l INFO
+#    links:
+#      - redis
+#    depends_on:
+#      - redis

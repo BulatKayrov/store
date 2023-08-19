@@ -3,24 +3,22 @@ from pathlib import Path
 import environ
 
 env = environ.Env(
-    DEBUG=(bool),
-    SECRET_KEY=(str),
+    DEBUG=bool,
+    SECRET_KEY=(str,),
 
-    EMAIL_HOST=(str),
-    EMAIL_PORT=(int),
-    EMAIL_HOST_USER=(str),
-    EMAIL_HOST_PASSWORD=(str),
-    EMAIL_USE_SSL=(bool),
-    DOMAIN_NAME=(str),
+    EMAIL_HOST=(str,),
+    EMAIL_PORT=(int,),
+    EMAIL_HOST_USER=(str,),
+    EMAIL_HOST_PASSWORD=(str,),
+    EMAIL_USE_SSL=(bool,),
+    DOMAIN_NAME=(str,),
 
-    REDIS_HOST=(str),
-    REDIS_PORT=(int),
+    REDIS_HOST=(str,),
+    REDIS_PORT=(int,),
 
-    DATABASE_NAME=(str),
-    DATABASE_USER=(str),
-    DATABASE_PASSWORD=(str),
-    DATABASE_HOST=(str),
-    DATABASE_PORT=(int),
+    DB_NAME=(str,),
+    DB_USER=(str,),
+    DB_PASSWORD=(str,),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -32,10 +30,10 @@ environ.Env.read_env(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -129,8 +127,8 @@ USE_TZ = True
 
 # Redis
 
-REDIS_HOST = env('REDIS_HOST')
-REDIS_PORT = env('REDIS_PORT')
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = os.getenv('REDIS_PORT')
 
 # caches
 
@@ -146,12 +144,13 @@ CACHES = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('DATABASE_NAME'),
-        'USER': env('DATABASE_USER'),
-        'PASSWORD': env('DATABASE_PASSWORD'),
-        'HOST': env('DATABASE_HOST'),
-        'PORT': env('DATABASE_PORT'),
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
@@ -177,16 +176,12 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = '/users/login/'
 
 # email
-
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_HOST = env('EMAIL_HOST')
-    EMAIL_PORT = env('EMAIL_PORT')
-    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_SSL = env('EMAIL_USE_SSL')
-    DOMAIN_NAME = env('DOMAIN_NAME')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL')
+DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 # OAuth
 
@@ -208,5 +203,5 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # celery
 
-CELERY_BROKER_URL = f'redis://{env("REDIS_HOST")}:{env("REDIS_PORT")}'
-CELERY_RESULT_BACKEND = f'redis://{env("REDIS_HOST")}:{env("REDIS_PORT")}'
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}'
