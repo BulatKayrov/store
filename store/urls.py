@@ -10,6 +10,8 @@ urlpatterns = [
     path('orders/', include('orders.urls', namespace='orders')),
 
     path('accounts/', include('allauth.urls')),
+
+    path('api/v1/', include('api_app.urls')),
 ]
 
 if settings.DEBUG:

@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
 
     'debug_toolbar',
+
+    'rest_framework',
+    'api_app',
 ]
 
 MIDDLEWARE = [
@@ -202,3 +205,10 @@ SOCIALACCOUNT_PROVIDERS = {
 
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+
+# django_rest_framework
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 1,
+}
