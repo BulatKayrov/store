@@ -1,39 +1,17 @@
 import os
 from pathlib import Path
-import environ
 
-env = environ.Env(
-    DEBUG=bool,
-    SECRET_KEY=(str,),
-
-    EMAIL_HOST=(str,),
-    EMAIL_PORT=(int,),
-    EMAIL_HOST_USER=(str,),
-    EMAIL_HOST_PASSWORD=(str,),
-    EMAIL_USE_SSL=(bool,),
-    DOMAIN_NAME=(str,),
-
-    REDIS_HOST=(str,),
-    REDIS_PORT=(int,),
-
-    DB_NAME=(str,),
-    DB_USER=(str,),
-    DB_PASSWORD=(str,),
+from store.config import (
+    DEBUG, SECRET_KEY, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, EMAIL_USE_SSL,
+    DOMAIN_NAME, REDIS_HOST, REDIS_PORT, REDIS_LOCAL, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
 )
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(BASE_DIR / '.env')
+SECRET_KEY = SECRET_KEY
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG')
+DEBUG = DEBUG
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -127,8 +105,14 @@ USE_TZ = True
 
 # Redis
 
-REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_PORT = os.getenv('REDIS_PORT')
+REDIS_PORT = REDIS_PORT
+
+if DEBUG:
+    REDIS_HOST = REDIS_LOCAL
+
+else:
+    REDIS_HOST = REDIS_HOST
+
 
 # caches
 
@@ -142,29 +126,42 @@ CACHES = {
 
 # Database
 
-DATABASES = {
-    'default': {
-        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'db',
-        'PORT': '5432',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'store_db',
+            'USER': 'username',
+            'PASSWORD': 'username',
+            'HOST': 'localhost',
+            'PORT': 5432,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': 'db',
+            'PORT': DB_PORT,
+        }
+    }
 
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
+
+if DEBUG:
+    STATICFILES_DIRS = [BASE_DIR / 'static']
+else:
+    STATIC_ROOT = BASE_DIR / 'static'
 
 # media
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 
@@ -176,12 +173,12 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = '/users/login/'
 
 # email
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = os.getenv('EMAIL_PORT')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL')
-DOMAIN_NAME = os.getenv('DOMAIN_NAME')
+EMAIL_HOST = EMAIL_HOST
+EMAIL_PORT = EMAIL_PORT
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_USE_SSL = EMAIL_USE_SSL
+DOMAIN_NAME = DOMAIN_NAME
 
 # OAuth
 
