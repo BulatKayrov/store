@@ -2,9 +2,7 @@ from django.contrib import admin
 
 from .models import Basket, Product, ProductCategory
 
-# class ProductCategoryInline(admin.TabularInline):
-#     model = ProductCategory
-#     fields = ('name', 'description')
+admin.site.register(Basket)
 
 
 @admin.register(Product)

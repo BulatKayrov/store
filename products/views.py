@@ -20,7 +20,7 @@ class ProductsListView(generic.ListView):
     model = Product
     template_name = 'products/products.html'
     context_object_name = 'products'
-    paginate_by = 6
+    paginate_by = 3
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -33,12 +33,11 @@ class ProductsListView(generic.ListView):
         context = super().get_context_data()
         context['title'] = 'Store - каталог'
         categories = cache.get('categories')
-        print(categories)
         if categories:
             context['categories'] = categories
         else:
             context['categories'] = ProductCategory.objects.all()
-            cache.set('categories', context['categories'], 30)
+            cache.set('categories', context['categories'], 15)
         return context
 
 
