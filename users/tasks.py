@@ -4,6 +4,7 @@ from datetime import timedelta
 from celery import shared_task
 from celery.schedules import crontab
 from django.conf import settings
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.utils.timezone import now
 
@@ -20,11 +21,9 @@ def send_email_verification(user_id):
     record.send_verification_email()
 
 
-@shared_task
-def spam_sale():
+def prepare_send_mail(obj):
     res = ''
-    product = Product.objects.all()
-    for item in product:
+    for item in obj:
         res += f'Product name: {item.name} new price - {item.price}\n'
     for user in User.objects.all():
         send_mail(
@@ -36,6 +35,17 @@ def spam_sale():
         )
 
 
+@shared_task
+def spam_sale():
+    product = cache.get('taks_product')
+    if product:
+        prepare_send_mail(obj=product)
+    else:
+        product = Product.objects.all()
+        cache.set('task_product', product, 5)
+        prepare_send_mail(obj=product)
+
+
 app.conf.beat_schedule = {
     'send_spam_every_1_min': {
         'task': 'users.tasks.spam_sale',
@@ -44,3 +54,5 @@ app.conf.beat_schedule = {
 }
 
 # celery -A store beat ## Запускает Celery Beat, чтобы он следил за расписанием
+# celery -A store worker -B -l INFO
+
